@@ -24,6 +24,11 @@ var rootCmd = &cobra.Command{
 
 			fmt.Println("$ openssl rsa -noout -text")
 			command("openssl rsa -noout -text", text)
+		case headline == "-----BEGIN EC PRIVATE KEY-----\n":
+			text := headline + stdin_rest()
+
+			fmt.Println("$ openssl ec -noout -text")
+			command("openssl ec -noout -text", text)
 		default:
 			fmt.Println("Unknown Format! Maybe not implemented yet.")
 		}
