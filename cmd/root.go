@@ -29,6 +29,11 @@ var rootCmd = &cobra.Command{
 
 			fmt.Println("$ openssl ec -noout -text")
 			command("openssl ec -noout -text", text)
+		case headline == "-----BEGIN CERTIFICATE REQUEST-----\n":
+			text := headline + stdin_rest()
+
+			fmt.Println("$ openssl req -noout -text")
+			command("openssl req -noout -text", text)
 		default:
 			fmt.Println("Unknown Format! Maybe not implemented yet.")
 		}
