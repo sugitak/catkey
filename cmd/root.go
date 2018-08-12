@@ -24,7 +24,7 @@ var rootCmd = &cobra.Command{
 
 			fmt.Println("$ openssl rsa -noout -text")
 			command("openssl rsa -noout -text", text)
-		case headline == "-----BEGIN EC PRIVATE KEY-----\n":
+		case headline == "-----BEGIN EC PRIVATE KEY-----\n" || headline == "-----BEGIN EC PARAMETERS-----\n":
 			text := headline + stdin_rest()
 
 			fmt.Println("$ openssl ec -noout -text")
