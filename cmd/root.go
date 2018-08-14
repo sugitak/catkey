@@ -10,32 +10,37 @@ import (
 	"strings"
 )
 
+var open_file = bufio.NewScanner(os.Stdin)
 var rootCmd = &cobra.Command{
 	Use:   "catkey",
 	Short: "catkey reads ssl/tls keys",
 	Long:  "catkey reads ssl/tls keys",
 	Run: func(cmd *cobra.Command, args []string) {
 		// case stdin
-		headline := stdin_first()
+		if len(args) != 0 {
+			fd, _ := os.Open(args[0])
+			open_file = bufio.NewScanner(fd)
+		}
+		headline := first_line()
 
 		switch {
 		case headline == "-----BEGIN RSA PRIVATE KEY-----\n":
-			text := headline + stdin_rest()
+			text := headline + rest_lines()
 
 			fmt.Println("$ openssl rsa -noout -text")
 			command("openssl rsa -noout -text", text)
 		case headline == "-----BEGIN EC PRIVATE KEY-----\n" || headline == "-----BEGIN EC PARAMETERS-----\n":
-			text := headline + stdin_rest()
+			text := headline + rest_lines()
 
 			fmt.Println("$ openssl ec -noout -text")
 			command("openssl ec -noout -text", text)
 		case headline == "-----BEGIN CERTIFICATE REQUEST-----\n":
-			text := headline + stdin_rest()
+			text := headline + rest_lines()
 
 			fmt.Println("$ openssl req -noout -text")
 			command("openssl req -noout -text", text)
 		case headline == "-----BEGIN CERTIFICATE-----\n":
-			text := headline + stdin_rest()
+			text := headline + rest_lines()
 
 			fmt.Println("$ openssl x509 -noout -text")
 			command("openssl req -noout -text", text)
@@ -45,17 +50,15 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-var stdin = bufio.NewScanner(os.Stdin)
-
-func stdin_first() string {
-	stdin.Scan()
-	return stdin.Text() + "\n"
+func first_line() string {
+	open_file.Scan()
+	return open_file.Text() + "\n"
 }
 
-func stdin_rest() string {
+func rest_lines() string {
 	text := ""
-	for stdin.Scan() {
-		text += stdin.Text() + "\n"
+	for open_file.Scan() {
+		text += open_file.Text() + "\n"
 	}
 	return text
 }
